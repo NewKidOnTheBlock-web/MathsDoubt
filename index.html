@@ -3,53 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network Diagnostics</title>
+    <title>Network Status</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            text-align: center; 
-            padding: 50px; 
-            background-color: #f4f4f9; 
-            color: #333;
-        }
-        .info-box { 
-            background: white; 
-            padding: 30px; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            display: inline-block; 
-            margin-top: 20px; 
-            min-width: 320px; 
-        }
-        h1 { margin-bottom: 5px; }
-        p { color: #666; }
-        .data-value { font-weight: bold; color: #007bff; }
+        body { font-family: sans-serif; text-align: center; padding: 50px; background-color: #f4f4f9; color: #333; }
+        .box { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: inline-block; min-width: 300px; margin-top: 20px; }
+        .val { font-weight: bold; color: #007bff; }
     </style>
 </head>
 <body>
 
-    <h1>Welcome to the Platform</h1>
-    <p>Your public network information is displayed below:</p>
+    <h1>System Diagnostics</h1>
+    <p>Active network verification stream:</p>
 
-    <div class="info-box">
-        <p><strong>Public IP:</strong> <span id="ip-address" class="data-value">Loading...</span></p>
-        <p><strong>Status:</strong> <span id="ip-status" class="data-value">Checking connection...</span></p>
+    <div class="box">
+        <p><strong>Public IP:</strong> <span id="my-ip" class="val">Loading...</span></p>
+        <p><strong>Connection:</strong> <span id="my-status" class="val">Checking...</span></p>
     </div>
 
     <script>
-        // Uses the reliable, unlimited ipify service to fetch the IP
-        fetch('https://ipify.org')
-            .then(response => {
-                if (!response.ok) throw new Error();
-                return response.json();
+        // Directly fetches your IP from a backup secondary provider to avoid server limit blocks
+        fetch('https://ip.sb')
+            .then(res => {
+                if(!res.ok) throw new Error();
+                return res.json();
             })
             .then(data => {
-                document.getElementById('ip-address').innerText = data.ip;
-                document.getElementById('ip-status').innerText = "Online / Network Verified";
+                document.getElementById('my-ip').innerText = data.ip;
+                document.getElementById('my-status').innerText = "Verified Online";
             })
-            .catch(error => {
-                document.getElementById('ip-address').innerText = "Unavailable";
-                document.getElementById('ip-status').innerText = "Connection blocked by browser or adblocker";
+            .catch(() => {
+                // Second backup network attempt if the primary fails
+                fetch('https://seeip.org')
+                    .then(res => res.json())
+                    .then(data => {
+                        document.getElementById('my-ip').innerText = data.ip;
+                        document.getElementById('my-status').innerText = "Verified Online (Backup)";
+                    })
+                    .catch(() => {
+                        document.getElementById('my-ip').innerText = "Blocked by Local Extensions";
+                        document.getElementById('my-status').innerText = "Check your adblocker or VPN settings";
+                    });
             });
     </script>
 
