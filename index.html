@@ -3,38 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Entry</title>
+    <title>Network Diagnostics</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #f4f4f9; }
-        .info-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: inline-block; margin-top: 20px; min-width: 300px; }
-        .btn { display: inline-block; padding: 12px 24px; color: white; background-color: #007bff; text-decoration: none; border-radius: 4px; margin-top: 20px; }
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            padding: 50px; 
+            background-color: #f4f4f9; 
+            color: #333;
+        }
+        .info-box { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+            display: inline-block; 
+            margin-top: 20px; 
+            min-width: 320px; 
+        }
+        h1 { margin-bottom: 5px; }
+        p { color: #666; }
+        .data-value { font-weight: bold; color: #007bff; }
     </style>
 </head>
 <body>
+
     <h1>Welcome to the Platform</h1>
-    <p>Your network connection information is displayed below:</p>
+    <p>Your public network information is displayed below:</p>
 
     <div class="info-box">
-        <p><strong>Public IP:</strong> <span id="ip-address">Loading...</span></p>
-        <p><strong>Approx. Location:</strong> <span id="ip-location">Loading...</span></p>
+        <p><strong>Public IP:</strong> <span id="ip-address" class="data-value">Loading...</span></p>
+        <p><strong>Status:</strong> <span id="ip-status" class="data-value">Checking connection...</span></p>
     </div>
-    <br>
-    <a href="tracker.html" class="btn">Proceed to GPS Tracker</a>
 
     <script>
-        // Automatically fetches the IP and network details using a public API
-        fetch('https://ipapi.co')
-            .then(response => response.json())
+        // Uses the reliable, unlimited ipify service to fetch the IP
+        fetch('https://ipify.org')
+            .then(response => {
+                if (!response.ok) throw new Error();
+                return response.json();
+            })
             .then(data => {
                 document.getElementById('ip-address').innerText = data.ip;
-                // Combines city, region, and country from the network data
-                document.getElementById('ip-location').innerText = `${data.city}, ${data.region}, ${data.country_name}`;
+                document.getElementById('ip-status').innerText = "Online / Network Verified";
             })
             .catch(error => {
                 document.getElementById('ip-address').innerText = "Unavailable";
-                document.getElementById('ip-location').innerText = "Could not load network details.";
-                console.error('Error fetching IP data:', error);
+                document.getElementById('ip-status').innerText = "Connection blocked by browser or adblocker";
             });
     </script>
+
 </body>
 </html>
