@@ -3,32 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Location Tracker</title>
+    <title>Dashboard Entry</title>
     <style>
-        body { font-family: Arial; text-align: center; padding: 50px; background-color: #f4f4f9; }
-        button { padding: 12px 24px; font-size: 16px; cursor: pointer; background-color: #04AA6D; color: white; border: none; border-radius: 4px; }
-        #demo { margin-top: 20px; font-size: 18px; font-weight: bold; }
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #f4f4f9; }
+        .info-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: inline-block; margin-top: 20px; min-width: 300px; }
+        .btn { display: inline-block; padding: 12px 24px; color: white; background-color: #007bff; text-decoration: none; border-radius: 4px; margin-top: 20px; }
     </style>
 </head>
 <body>
-    <h2>HTML Geolocation Tracker</h2>
-    <button onclick="getLocation()">Get My Location</button>
-    <div id="demo"></div>
+    <h1>Welcome to the Platform</h1>
+    <p>Your network connection information is displayed below:</p>
+
+    <div class="info-box">
+        <p><strong>Public IP:</strong> <span id="ip-address">Loading...</span></p>
+        <p><strong>Approx. Location:</strong> <span id="ip-location">Loading...</span></p>
+    </div>
+    <br>
+    <a href="tracker.html" class="btn">Proceed to GPS Tracker</a>
 
     <script>
-    const x = document.getElementById("demo");
-    function getLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.watchPosition(showPosition, showError);
-        } else { x.innerHTML = "Geolocation not supported."; }
-    }
-    function showPosition(p) {
-        x.innerHTML = "Lat: " + p.coords.latitude + "<br>Long: " + p.coords.longitude;
-    }
-    function showError(e) {
-        x.innerHTML = "Error: " + e.message;
-    }
+        // Automatically fetches the IP and network details using a public API
+        fetch('https://ipapi.co')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('ip-address').innerText = data.ip;
+                // Combines city, region, and country from the network data
+                document.getElementById('ip-location').innerText = `${data.city}, ${data.region}, ${data.country_name}`;
+            })
+            .catch(error => {
+                document.getElementById('ip-address').innerText = "Unavailable";
+                document.getElementById('ip-location').innerText = "Could not load network details.";
+                console.error('Error fetching IP data:', error);
+            });
     </script>
 </body>
 </html>
-
